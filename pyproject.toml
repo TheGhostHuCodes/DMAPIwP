@@ -10,6 +10,8 @@ fastapi = "^0.63.0"
 uvicorn = "^0.13.4"
 starlette = "^0.13.6"
 pydantic = "^1.8.1"
+apispec = {extras = ["yaml"], version = "^4.4.0"}
+marshmallow = "^3.11.1"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.7.0"
