@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import HTTPException, Response
 from starlette import status
 
-from orders.api.schemas import CreateOrder, GetOrder
+from orders.api.schemas import CreateOrder, GetOrder, Status
 from orders.app import app
 
 ORDERS: Dict[UUID, Any] = {}
@@ -21,9 +21,17 @@ def get_orders(cancelled: Optional[bool] = None, limit: Optional[int] = None):
 
     if cancelled is not None:
         if cancelled:
-            query_set = [order for order in query_set if order["status"] == "cancelled"]
+            query_set = [
+                order
+                for order in query_set
+                if order["status"] == Status.cancelled.value
+            ]
         else:
-            query_set = [order for order in query_set if order["status"] != "cancelled"]
+            query_set = [
+                order
+                for order in query_set
+                if order["status"] != Status.cancelled.value
+            ]
 
     if limit is not None and len(query_set) > limit:
         return query_set[:limit]
@@ -83,7 +91,7 @@ def delete_order(order_id: UUID):
 @app.post("/orders/{order_id}/cancel", response_model=GetOrder)
 def cancel_order(order_id: UUID):
     if order_id in ORDERS:
-        ORDERS[order_id]["status"] = "canceled"
+        ORDERS[order_id]["status"] = Status.cancelled.value
         return ORDERS[order_id]
     else:
         raise HTTPException(

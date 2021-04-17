@@ -14,7 +14,7 @@ class Size(str, Enum):
 class Status(str, Enum):
     created = "created"
     progress = "progress"
-    canceled = "canceled"
+    cancelled = "cancelled"
     dispatched = "dispatched"
     delivered = "delivered"
     completed = "completed"
