@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, Extra, Field  # pylint: disable=no-name-in-module
 
 
 class SizeEnum(str, Enum):
@@ -25,9 +25,15 @@ class OrderItemSchema(BaseModel):
     size: SizeEnum
     quantity: int = Field(default=1, ge=1)
 
+    class Config:
+        extra = Extra.forbid
+
 
 class CreateOrderSchema(BaseModel):
     order: List[OrderItemSchema]
+
+    class Config:
+        extra = Extra.forbid
 
 
 class GetOrderSchema(CreateOrderSchema):
