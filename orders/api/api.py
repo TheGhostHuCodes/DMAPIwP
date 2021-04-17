@@ -1,7 +1,7 @@
 import time
 import uuid
 from http import HTTPStatus
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException, Response
@@ -14,8 +14,21 @@ ORDERS: Dict[UUID, Any] = {}
 
 
 @app.get("/orders", response_model=List[GetOrderSchema])
-def get_orders():
-    return list(ORDERS.values())
+def get_orders(cancelled: Optional[bool] = None, limit: Optional[int] = None):
+    query_set = list(ORDERS.values())
+    if cancelled is None and limit is None:
+        return query_set
+
+    if cancelled is not None:
+        if cancelled:
+            query_set = [order for order in query_set if order["status"] == "cancelled"]
+        else:
+            query_set = [order for order in query_set if order["status"] != "cancelled"]
+
+    if limit is not None and len(query_set) > limit:
+        return query_set[:limit]
+
+    return query_set
 
 
 @app.post("/orders", status_code=status.HTTP_201_CREATED, response_model=GetOrderSchema)
