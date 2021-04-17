@@ -5,13 +5,13 @@ from uuid import UUID
 from pydantic import BaseModel, Extra, Field  # pylint: disable=no-name-in-module
 
 
-class SizeEnum(str, Enum):
+class Size(str, Enum):
     small = "small"
     medium = "medium"
     big = "big"
 
 
-class StatusEnum(str, Enum):
+class Status(str, Enum):
     created = "created"
     progress = "progress"
     canceled = "canceled"
@@ -20,23 +20,23 @@ class StatusEnum(str, Enum):
     completed = "completed"
 
 
-class OrderItemSchema(BaseModel):
+class OrderItem(BaseModel):
     product: str
-    size: SizeEnum
+    size: Size
     quantity: int = Field(default=1, ge=1)
 
     class Config:
         extra = Extra.forbid
 
 
-class CreateOrderSchema(BaseModel):
-    order: List[OrderItemSchema]
+class CreateOrder(BaseModel):
+    order: List[OrderItem]
 
     class Config:
         extra = Extra.forbid
 
 
-class GetOrderSchema(CreateOrderSchema):
+class GetOrder(CreateOrder):
     id_: UUID = Field(alias="id")
     created: int = Field(description="Date in the form of UNIX timestamp")
-    status: StatusEnum
+    status: Status

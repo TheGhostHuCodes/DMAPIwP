@@ -7,13 +7,13 @@ from uuid import UUID
 from fastapi import HTTPException, Response
 from starlette import status
 
-from orders.api.schemas import CreateOrderSchema, GetOrderSchema
+from orders.api.schemas import CreateOrder, GetOrder
 from orders.app import app
 
 ORDERS: Dict[UUID, Any] = {}
 
 
-@app.get("/orders", response_model=List[GetOrderSchema])
+@app.get("/orders", response_model=List[GetOrder])
 def get_orders(cancelled: Optional[bool] = None, limit: Optional[int] = None):
     query_set = list(ORDERS.values())
     if cancelled is None and limit is None:
@@ -31,8 +31,8 @@ def get_orders(cancelled: Optional[bool] = None, limit: Optional[int] = None):
     return query_set
 
 
-@app.post("/orders", status_code=status.HTTP_201_CREATED, response_model=GetOrderSchema)
-def create_order(order_details: CreateOrderSchema):
+@app.post("/orders", status_code=status.HTTP_201_CREATED, response_model=GetOrder)
+def create_order(order_details: CreateOrder):
     order = order_details.dict()
     id_ = uuid.uuid4()
     order["id"] = id_
@@ -42,7 +42,7 @@ def create_order(order_details: CreateOrderSchema):
     return order
 
 
-@app.get("/orders/{order_id}", response_model=GetOrderSchema)
+@app.get("/orders/{order_id}", response_model=GetOrder)
 def get_order(order_id: UUID):
     if order_id in ORDERS:
         return ORDERS[order_id]
@@ -53,8 +53,8 @@ def get_order(order_id: UUID):
         )
 
 
-@app.put("/orders/{order_id}", response_model=GetOrderSchema)
-def update_order(order_id: UUID, order_details: CreateOrderSchema):
+@app.put("/orders/{order_id}", response_model=GetOrder)
+def update_order(order_id: UUID, order_details: CreateOrder):
     if order_id in ORDERS:
         ORDERS[order_id].update(order_details.dict())
     else:
@@ -80,7 +80,7 @@ def delete_order(order_id: UUID):
         )
 
 
-@app.post("/orders/{order_id}/cancel", response_model=GetOrderSchema)
+@app.post("/orders/{order_id}/cancel", response_model=GetOrder)
 def cancel_order(order_id: UUID):
     if order_id in ORDERS:
         ORDERS[order_id]["status"] = "canceled"
@@ -92,7 +92,7 @@ def cancel_order(order_id: UUID):
         )
 
 
-@app.post("/orders/{order_id}/pay", response_model=GetOrderSchema)
+@app.post("/orders/{order_id}/pay", response_model=GetOrder)
 def pay_order(order_id: UUID):
     if order_id in ORDERS:
         ORDERS[order_id]["status"] = "progress"
